@@ -12,8 +12,8 @@ public class CloudifyRestClient2 {
 			RestClient restClient = new RestClient(url, "admin", "admin");
 			boolean flag = true;
 	        while (flag) {
-	        	System.out.println("------------------------------");
-				System.out.println("Cloudify");
+				System.out.println("Cloudify Rest Client");
+				System.out.println("Endpoint: "+url);
 				System.out.println("------------------------------");
 				System.out.println("1 - List Blueprints");
 				System.out.println("2 - List Deployments");
@@ -23,6 +23,7 @@ public class CloudifyRestClient2 {
 				System.out.println("6 - List Plugins");
 				System.out.println("7 - List Tenants");
 				System.out.println("8 - List Users");
+				System.out.println("9 - List Executions");
 	            System.out.print("Enter : ");
 	            String key = scanner.nextLine();
 	            String response = "";
@@ -50,6 +51,9 @@ public class CloudifyRestClient2 {
 					break;
 				case "8":
 					response = restClient.get("users?_include=id");
+					break;
+				case "9":
+					response = restClient.get("executions?_include=id,blueprint_id,deployment_id");
 					break;
 				default:
 					flag = false;
