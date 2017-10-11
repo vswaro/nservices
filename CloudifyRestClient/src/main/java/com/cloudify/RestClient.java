@@ -100,7 +100,7 @@ public class RestClient {
 			final HttpResponse response = httpClient.execute(httpMethod);
 
 			final int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode != 200) {
+			if (statusCode != 200 && statusCode != 201) {
 				final String reasonPhrase = response.getStatusLine().getReasonPhrase();
 				throw new Exception(reasonPhrase);
 

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class CloudifyRestClient {
     // HostOnly - 172.16.0.1 Bridge - 10.11.94.58
 	private static final String HOSTURL = "http://10.11.94.58/api/v3.1";
@@ -19,11 +22,11 @@ public class CloudifyRestClient {
 		restClient1 = new RestClient(USERNAME, PASSWORD, url);
 	}
 
-	public static String getList(String operationOn) throws Exception {
-		return getList(operationOn, null);
+	public static String processList(String operationOn) throws Exception {
+		return processList(operationOn, null);
 	}
 	
-	public static String getList(String operationOn, Map<String, String> params) throws Exception {
+	public static String processList(String operationOn, Map<String, String> params) throws Exception {
 		String relativeURL = operationOn;
 		if(params!=null && params.entrySet().size()>0)
 			relativeURL = relativeURL +  "?" + getParamStr(params);
@@ -32,10 +35,10 @@ public class CloudifyRestClient {
 		return (String)restClient1.get(relativeURL, headers);
 	}
 	
-	public static String getGet(String operationOn) throws Exception {
-		return getGet(operationOn, null);
+	public static String processGet(String operationOn) throws Exception {
+		return processGet(operationOn, null);
 	}
-	public static String getGet(String operationOn, Map<String, String> params) throws Exception {
+	public static String processGet(String operationOn, Map<String, String> params) throws Exception {
 		String relativeURL = operationOn;
 		if(params!=null && params.entrySet().size()>0)
 			relativeURL = relativeURL +  "?" + getParamStr(params);
@@ -43,8 +46,15 @@ public class CloudifyRestClient {
 		System.out.println(operationOn + "GET: "+relativeURL);
 		return (String)restClient1.get(relativeURL, headers);
 	}
+	
+	public static String processExecutions(String operationOn, Map<String, String> params) throws Exception {
+		String relativeURL = operationOn;
 
-	public String executeCommandList(String[] inputTokens) throws Exception{
+		System.out.println(operationOn.toUpperCase()+ ": "+relativeURL);
+		return (String)restClient1.post(relativeURL, params, headers);
+	}
+
+	public String executeListCommand(String[] inputTokens) throws Exception{
 		String response = "";
 		String operationOn = inputTokens.length>1?inputTokens[1]:"";
 		String printShort = inputTokens.length>2?inputTokens[2]:null;
@@ -54,11 +64,31 @@ public class CloudifyRestClient {
 			params.put("_include", "id");
 		}
 		
-		response = CloudifyRestClient.getList(operationOn, params);
+		response = CloudifyRestClient.processList(operationOn, params);
+		return response;
+	}
+	
+	public String executeExecutionsCommand(String[] inputTokens) throws Exception{
+		String response = "";
+		String operationOn = inputTokens.length>0?inputTokens[0]:"";
+		String deploymentId = inputTokens.length>1?inputTokens[1]:"";
+		String worflowId = inputTokens.length>2?inputTokens[2]:null;
+
+		/*ObjectMapper mapper = new ObjectMapper();
+        ObjectNode executionsNode = mapper.createObjectNode();
+        executionsNode.put("deployment_id", deploymentId);
+        executionsNode.put("workflow_id", worflowId);
+        executionsNode.toString();*/
+        
+        Map<String, String> params = new HashMap<String,String>();
+        params.put("deployment_id", deploymentId);
+        params.put("workflow_id", worflowId);
+		
+		response = CloudifyRestClient.processExecutions(operationOn, params);
 		return response;
 	}
 
-	public String executeCommandGet(String[] inputTokens) throws Exception{
+	public String executeGetCommand(String[] inputTokens) throws Exception{
 		String response = "";
 		String operationOn = inputTokens.length>1?inputTokens[1]:"";
 		String inputId = inputTokens.length>2?inputTokens[2]:null;
@@ -71,7 +101,7 @@ public class CloudifyRestClient {
 			params.put("_include", "id");
 		}
 		
-		response = CloudifyRestClient.getGet(operationOn, params);
+		response = CloudifyRestClient.processGet(operationOn, params);
 		return response;
 	}
 	
@@ -106,10 +136,13 @@ public class CloudifyRestClient {
 
 			switch (operation) {
 			case "list":
-				response = client.executeCommandList(inputTokens);
+				response = client.executeListCommand(inputTokens);
 				break;
 			case "get":
-				response = client.executeCommandGet(inputTokens);
+				response = client.executeGetCommand(inputTokens);
+				break;
+			case "executions":
+				response = client.executeExecutionsCommand(inputTokens);
 				break;
 			case "help":
 				printHelp();
@@ -138,6 +171,7 @@ public class CloudifyRestClient {
 		System.out.println("Help : These commands are defined internally. Type 'help' or'exit'");
 		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups");
 		System.out.println("Usage: get [options] [inputs]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version \n \t inputs: -s  prints short details, default prints all");
+		System.out.println("Usage: executions <deploymentId> [workflowId] \n \t worflowid: install|uninstall");
 	}
 
 }
