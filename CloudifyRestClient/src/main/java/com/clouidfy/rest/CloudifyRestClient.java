@@ -55,13 +55,34 @@ public class CloudifyRestClient {
 		String response = "";
 		String operationOn = inputTokens.length>1?inputTokens[1]:"";
 		String printShort = inputTokens.length>2?inputTokens[2]:null;
-
+		String printShortDetailId = inputTokens.length>3?inputTokens[3]:null;
+		printShortDetailId = printShortDetailId==null?"id":printShortDetailId;
+		
 		Map<String, String> params = new HashMap<String,String>();
 		if (printShort!=null && printShort.equals("-s")) {
-			params.put("_include", "id");
+			params.put("_include", printShortDetailId);
 		}
 		
 		response = CloudifyRestClient.processList(operationOn, params);
+		return response;
+	}
+	
+	public String executeGetCommand(String[] inputTokens) throws Exception{
+		String response = "";
+		String operationOn = inputTokens.length>1?inputTokens[1]:"";
+		String inputId = inputTokens.length>2?inputTokens[2]:null;
+		String printShort = inputTokens.length>3?inputTokens[3]:null;
+		String printShortDetailId = inputTokens.length>4?inputTokens[4]:null;
+		printShortDetailId = printShortDetailId==null?"id":printShortDetailId;
+		
+		Map<String, String> params = new HashMap<String,String>();
+		if(inputId!=null)
+			params.put("id", inputId);
+		if (printShort!=null && printShort.equals("-s")) {
+			params.put("_include", printShortDetailId);
+		}
+		
+		response = CloudifyRestClient.processGet(operationOn, params);
 		return response;
 	}
 	
@@ -71,12 +92,6 @@ public class CloudifyRestClient {
 		String deploymentId = inputTokens.length>1?inputTokens[1]:"";
 		String worflowId = inputTokens.length>2?inputTokens[2]:null;
 
-		/*ObjectMapper mapper = new ObjectMapper();
-        ObjectNode executionsNode = mapper.createObjectNode();
-        executionsNode.put("deployment_id", deploymentId);
-        executionsNode.put("workflow_id", worflowId);
-        executionsNode.toString();*/
-        
         Map<String, String> params = new HashMap<String,String>();
         params.put("deployment_id", deploymentId);
         params.put("workflow_id", worflowId);
@@ -84,24 +99,6 @@ public class CloudifyRestClient {
 		response = CloudifyRestClient.processExecutions(operationOn, params);
 		return response;
 	}
-
-	public String executeGetCommand(String[] inputTokens) throws Exception{
-		String response = "";
-		String operationOn = inputTokens.length>1?inputTokens[1]:"";
-		String inputId = inputTokens.length>2?inputTokens[2]:null;
-		String printShort = inputTokens.length>3?inputTokens[3]:null;
-		
-		Map<String, String> params = new HashMap<String,String>();
-		if(inputId!=null)
-			params.put("id", inputId);
-		if (printShort!=null && printShort.equals("-s")) {
-			params.put("_include", "id");
-		}
-		
-		response = CloudifyRestClient.processGet(operationOn, params);
-		return response;
-	}
-	
 	public static String getParamStr(Map<String, String> params) {
 		StringBuilder paramsBuilder = new StringBuilder();
 		for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -133,13 +130,25 @@ public class CloudifyRestClient {
 
 			switch (operation) {
 			case "list":
-				response = client.executeListCommand(inputTokens);
+				try {
+					response = client.executeListCommand(inputTokens);
+				} catch (Exception e) {
+					response = e.getMessage();
+				}
 				break;
 			case "get":
-				response = client.executeGetCommand(inputTokens);
+				try {
+					response = client.executeGetCommand(inputTokens);
+				} catch (Exception e) {
+					response = e.getMessage();
+				}
 				break;
 			case "executions":
-				response = client.executeExecutionsCommand(inputTokens);
+				try {
+					response = client.executeExecutionsCommand(inputTokens);
+				} catch (Exception e) {
+					response = e.getMessage();
+				}
 				break;
 			case "help":
 				printHelp();
@@ -167,8 +176,8 @@ public class CloudifyRestClient {
 	private static void printHelp() {
 		System.out.println("Commands Help");
 		System.out.println("Usage: 'help' or'exit'");
-		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|events \n\t inputs: -s  -> prints minimal details (or) by default prints all \n\t Example: list deployments -s");
-		System.out.println("Usage: get [options] [inputs]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version \n \t inputs: -s  -> prints minimal details (or) by default prints all \n\t Example: get executions 953f7e7a-0fb8-4af4-9899-a5f5c0595a3f");
+		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|events \n\t inputs: -s <json elements> -> prints minimal details (or) by default prints all \n\t Example: list deployments -s id,deployment_id");
+		System.out.println("Usage: get [options] [inputs]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version \n \t inputs: -s <json elements> -> prints minimal details (or) by default prints all \n\t Example: get executions 953f7e7a-0fb8-4af4-9899-a5f5c0595a3f -s id");
 		System.out.println("Usage: executions <deployment-id> [workflowId] \n\t worflowId: install|uninstall \n\t Example: executions nodecellar-docker-deploy1 install ");
 	}
 
