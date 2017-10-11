@@ -43,7 +43,7 @@ public class CloudifyRestClient {
 		CloudifyRestClient client = new CloudifyRestClient();
 		Scanner scanner = new Scanner(System.in);
 
-		System.out.println("Cloudify Rest Client ("+HOSTURL+")");
+		System.out.println("Cloudify Rest Client (Host:"+HOSTURL+")");
 		System.out.println("----------------------------------------------------------------");
 		printHelp();
 
@@ -79,16 +79,19 @@ public class CloudifyRestClient {
 			default:
 				break;
 			}
-			if(!key.equals("help") && !key.equals("exit"))
+			if(!key.equals("help") && !key.equals("exit")) {
+				System.out.println("Printing response from host("+ HOSTURL +") ....");
 				System.out.println(response);
+			}
 		}
 		scanner.close();
 
 	}
 
 	private static void printHelp() {
-		System.out.println("list blueprints|deployments|executions|node-instances|nodes");
-		System.out.println("get blueprints|deployments|executions|node-instances|nodes");
+		System.out.println("Help : These commands are defined internally. Type 'help' or'exit'");
+		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes");
+		System.out.println("Usage: get [options]\n \t options: blueprints|deployments|executions|node-instances|nodes");
 	}
 
 }
