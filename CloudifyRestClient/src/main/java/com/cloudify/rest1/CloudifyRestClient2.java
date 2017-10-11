@@ -1,4 +1,4 @@
-package com.cloudify;
+package com.cloudify.rest1;
 
 import java.util.Scanner;
 
@@ -9,7 +9,7 @@ public class CloudifyRestClient2 {
 		
 		String url = "http://172.16.0.1/api/v3.1";
 		try {
-			RestClient11 restClient = new RestClient11(url, "admin", "admin");
+			RestClient1 restClient = new RestClient1(url, "admin", "admin");
 			boolean flag = true;
 	        while (flag) {
 				System.out.println("Cloudify Rest Client");

@@ -1,4 +1,4 @@
-package com.cloudify;
+package com.clouidfy.rest;
 
 import java.net.URL;
 import java.util.HashMap;

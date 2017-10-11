@@ -1,4 +1,4 @@
-package com.cloudify;
+package com.cloudify.rest1;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

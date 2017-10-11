@@ -1,8 +1,8 @@
-package com.cloudify;
+package com.cloudify.rest1;
 
-public class RestClient11 {
+public class RestClient1 {
 	RestClientExecutor clientExecutor;
-	public RestClient11(final String url, final String username, final String password) throws Exception {
+	public RestClient1(final String url, final String username, final String password) throws Exception {
 		this.clientExecutor = createExecutor(url, username, password);
 	}
 	
