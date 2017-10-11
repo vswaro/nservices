@@ -13,7 +13,7 @@ public class CloudifyRestClient {
 
 	private RestClient restClient1;
 	private final Map<String,String> headers = new HashMap<String, String>(); { headers.put("Tenant", "default_tenant"); }
-	
+
 	public CloudifyRestClient() throws Exception {
 		URL  url = new URL(HOSTURL);
 		restClient1 = new RestClient(USERNAME, PASSWORD, url);
@@ -44,7 +44,7 @@ public class CloudifyRestClient {
 		Scanner scanner = new Scanner(System.in);
 
 		System.out.println("Cloudify Rest Client (Host:"+HOSTURL+")");
-		System.out.println("----------------------------------------------------------------");
+		System.out.println("----------------------------------------------------------------------");
 		printHelp();
 
 		String response = "";
@@ -77,9 +77,10 @@ public class CloudifyRestClient {
 				flag = false;
 				break;
 			default:
+				flag = false;
 				break;
 			}
-			if(!key.equals("help") && !key.equals("exit")) {
+			if(!key.equals("help") && !key.equals("exit") && !key.equals("")) {
 				System.out.println("Printing response from host("+ HOSTURL +") ....");
 				System.out.println(response);
 			}
