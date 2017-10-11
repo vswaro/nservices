@@ -171,7 +171,7 @@ public class CloudifyRestClient {
 		System.out.println("Help : These commands are defined internally. Type 'help' or'exit'");
 		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups");
 		System.out.println("Usage: get [options] [inputs]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version \n \t inputs: -s  prints short details, default prints all");
-		System.out.println("Usage: executions <deploymentId> [workflowId] \n \t worflowid: install|uninstall");
+		System.out.println("Usage: executions <deployment-id> [workflowId] \n \t worflowid: install|uninstall");
 	}
 
 }
