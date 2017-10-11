@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 public class CloudifyRestClient {
     // HostOnly - 172.16.0.1 Bridge - 10.11.94.58
 	private static final String HOSTURL = "http://10.11.94.58/api/v3.1";
