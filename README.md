@@ -11,14 +11,19 @@ Prerequiste
 <b>Cloudify Rest Client (Host:http://10.11.94.58/api/v3.1) </b>
 
 ```shell
-Help : These commands are defined internally. Type 'help' or'exit'
+Commands Help
+Usage: 'help' or'exit'
 Usage: list [options]
- 	 options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups
+ 	 options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|events 
+	 inputs: -s  -> prints minimal details (or) by default prints all 
+	 Example: list deployments -s
 Usage: get [options] [inputs]
  	 options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version 
- 	 inputs: -s  prints short details, default prints all
-Usage: executions <deploymentId> [workflowId] 
- 	 worflowid: install|uninstall
+ 	 inputs: -s  -> prints minimal details (or) by default prints all 
+	 Example: get executions 953f7e7a-0fb8-4af4-9899-a5f5c0595a3f
+Usage: executions <deployment-id> [workflowId] 
+	 worflowId: install|uninstall 
+	 Example: executions nodecellar-docker-deploy1 install 
 >>
 list deployments -s
 DEPLOYMENTS LIST: deployments?_include=id&
@@ -111,14 +116,19 @@ executionsGET: executions?id=953f7e7a-0fb8-4af4-9899-a5f5c0595a3f&
 }
 >>
 help
-Help : These commands are defined internally. Type 'help' or'exit'
+Commands Help
+Usage: 'help' or'exit'
 Usage: list [options]
- 	 options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups
+ 	 options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|events 
+	 inputs: -s  -> prints minimal details (or) by default prints all 
+	 Example: list deployments -s
 Usage: get [options] [inputs]
  	 options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version 
- 	 inputs: -s  prints short details, default prints all
-Usage: executions <deploymentId> [workflowId] 
- 	 worflowid: install|uninstall
+ 	 inputs: -s  -> prints minimal details (or) by default prints all 
+	 Example: get executions 953f7e7a-0fb8-4af4-9899-a5f5c0595a3f
+Usage: executions <deployment-id> [workflowId] 
+	 worflowId: install|uninstall 
+	 Example: executions nodecellar-docker-deploy1 install 
 >>
 list blueprints -s
 BLUEPRINTS LIST: blueprints?_include=id&
