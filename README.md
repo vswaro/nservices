@@ -8,8 +8,9 @@ Prerequiste
 3. Open cmd and goto downloaded jar folder 
 4. Execute "java -jar CloudifyRestClient.jar"
 
-```shell
 <b>Cloudify Rest Client (Host:http://10.11.94.58/api/v3.1) </b>
+
+```shell
 Help : These commands are defined internally. Type 'help' or'exit'
 Usage: list [options]
  	 options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups
