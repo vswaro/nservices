@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class CloudifyRestClient {
     // HostOnly - 172.16.0.1 Bridge - 10.11.94.58
-	private static final String HOSTURL = "http://10.11.94.58/api/v3.1";
+	private static final String HOSTURL = "http://10.11.94.58/api/v3.1/";
 	private final String USERNAME = "admin";
 	private final String PASSWORD = "admin"; 
 
@@ -28,7 +28,7 @@ public class CloudifyRestClient {
 		if(params!=null && params.entrySet().size()>0)
 			relativeURL = relativeURL +  "?" + getParamStr(params);
 		
-		System.out.println(operationOn.toUpperCase()+ " LIST: "+relativeURL);
+		System.out.println("Response from Cloudify host("+HOSTURL+relativeURL+")....");
 		return (String)restClient1.get(relativeURL, headers);
 	}
 	
@@ -40,14 +40,14 @@ public class CloudifyRestClient {
 		if(params!=null && params.entrySet().size()>0)
 			relativeURL = relativeURL +  "?" + getParamStr(params);
 		
-		System.out.println(operationOn + "GET: "+relativeURL);
+		System.out.println("Response from Cloudify host("+HOSTURL+relativeURL+")....");
 		return (String)restClient1.get(relativeURL, headers);
 	}
 	
 	public static String processExecutions(String operationOn, Map<String, String> params) throws Exception {
 		String relativeURL = operationOn;
 
-		System.out.println(operationOn.toUpperCase()+ ": "+relativeURL);
+		System.out.println("Response from Cloudify host("+HOSTURL+relativeURL+")....");
 		return (String)restClient1.post(relativeURL, params, headers);
 	}
 
@@ -165,10 +165,11 @@ public class CloudifyRestClient {
 	}
 
 	private static void printHelp() {
-		System.out.println("Help : These commands are defined internally. Type 'help' or'exit'");
-		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups");
-		System.out.println("Usage: get [options] [inputs]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version \n \t inputs: -s  prints short details, default prints all");
-		System.out.println("Usage: executions <deployment-id> [workflowId] \n \t worflowid: install|uninstall");
+		System.out.println("Commands Help");
+		System.out.println("Usage: 'help' or'exit'");
+		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|events \n\t inputs: -s  -> prints minimal details (or) by default prints all \n\t Example: list deployments -s");
+		System.out.println("Usage: get [options] [inputs]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version \n \t inputs: -s  -> prints minimal details (or) by default prints all \n\t Example: get executions 953f7e7a-0fb8-4af4-9899-a5f5c0595a3f");
+		System.out.println("Usage: executions <deployment-id> [workflowId] \n\t worflowId: install|uninstall \n\t Example: executions nodecellar-docker-deploy1 install ");
 	}
 
 }
