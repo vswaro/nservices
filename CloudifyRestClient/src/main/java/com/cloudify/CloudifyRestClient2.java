@@ -9,7 +9,7 @@ public class CloudifyRestClient2 {
 		
 		String url = "http://172.16.0.1/api/v3.1";
 		try {
-			RestClient restClient = new RestClient(url, "admin", "admin");
+			RestClient11 restClient = new RestClient11(url, "admin", "admin");
 			boolean flag = true;
 	        while (flag) {
 				System.out.println("Cloudify Rest Client");
@@ -71,4 +71,5 @@ public class CloudifyRestClient2 {
 		scanner.close();
 		
 	}
+	
 }

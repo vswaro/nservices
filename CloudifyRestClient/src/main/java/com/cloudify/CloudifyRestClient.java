@@ -1,72 +1,94 @@
 package com.cloudify;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 public class CloudifyRestClient {
 
-	public static void main(String[] args) {
-		
+	private static final String HOSTURL = "http://172.16.0.1/api/v3.1";
+	private final String USERNAME = "admin";
+	private final String PASSWORD = "admin"; 
+
+	private RestClient restClient1;
+	private final Map<String,String> headers = new HashMap<String, String>(); { headers.put("Tenant", "default_tenant"); }
+	
+	public CloudifyRestClient() throws Exception {
+		URL  url = new URL(HOSTURL);
+		restClient1 = new RestClient(USERNAME, PASSWORD, url);
+	}
+
+	public String getBlueprintsList() throws Exception {
+		return (String)restClient1.get("blueprints?_include=id", headers);
+	}
+
+	public String getDeploymentsList() throws Exception {
+		return (String)restClient1.get("deployments?_include=id", headers);
+	}
+
+	public String getExecutionList() throws Exception {
+		return (String)restClient1.get("executions?_include=id", headers);
+	}
+
+	public String getNodeInstancesList() throws Exception {
+		return (String)restClient1.get("node-instances?_include=id", headers);
+	}
+
+	public String getNodesList() throws Exception {
+		return (String)restClient1.get("nodes?_include=id", headers);
+	}
+
+	public static void main(String[] args) throws Exception {
 		CloudifyRestClient client = new CloudifyRestClient();
-		try {
-			client.getBlueprints();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		Scanner scanner = new Scanner(System.in);
+
+		System.out.println("Cloudify Rest Client ("+HOSTURL+")");
+		System.out.println("----------------------------------------------------------------");
+		printHelp();
+
+		String response = "";
+		boolean flag = true;
+		while (flag) {
+			System.out.println(">>");
+			String key = scanner.nextLine();
+			key = key!=null?key.toLowerCase():key;
+
+			switch (key) {
+			case "list blueprints":
+				response = client.getBlueprintsList();
+				break;
+			case "list deployments":
+				response = client.getDeploymentsList();
+				break;
+			case "list executions":
+				response = client.getExecutionList();
+				break;
+			case "list node-instances":
+				response = client.getNodeInstancesList();
+				break;
+			case "list nodes":
+				response = client.getNodesList();
+				break;
+			case "help":
+				printHelp();
+				break;
+			case "exit":
+				flag = false;
+				break;
+			default:
+				break;
+			}
+			if(!key.equals("help") && !key.equals("exit"))
+				System.out.println(response);
 		}
+		scanner.close();
+
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	public void getBlueprints() throws Exception {
-
-		CredentialsProvider provider = new BasicCredentialsProvider();
-		UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
-		provider.setCredentials(AuthScope.ANY, credentials);
-
-		String url = "http://172.16.0.1/api/v3.1/blueprints";
-
-		HttpClient client = HttpClientBuilder.create()
-				.setDefaultCredentialsProvider(provider)
-				.build();
-		HttpGet request = new HttpGet(url);
-
-		// add request header
-		request.addHeader("Tenant", "default_tenant");
-
-		HttpResponse response = client.execute(request);
-		System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
-
-		BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-		StringBuffer result = new StringBuffer();
-		String line = "";
-		while ((line = rd.readLine()) != null) {
-			result.append(line);
-		}
-		rd.close();
-		//System.out.println(result.toString());
-		
-		ObjectMapper mapper = new ObjectMapper();
-		Object json = mapper.readValue(result.toString(), Object.class);
-		
-		String indented = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
-		System.out.println(indented);
-		
-		
+	private static void printHelp() {
+		System.out.println("list blueprints|deployments|executions|node-instances|nodes");
+		System.out.println("get blueprints|deployments|executions|node-instances|nodes");
 	}
-
-
 
 }
