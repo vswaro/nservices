@@ -44,7 +44,7 @@ public class CloudifyRestClient {
 		return (String)restClient1.get(relativeURL, headers);
 	}
 	
-	public static String processExecutions(String operationOn, Map<String, String> params) throws Exception {
+	public static String processExecutions(String operationOn, Map<String, Object> params) throws Exception {
 		String relativeURL = operationOn;
 
 		System.out.println("Response from Cloudify host("+HOSTURL+relativeURL+")....");
@@ -92,7 +92,7 @@ public class CloudifyRestClient {
 		String deploymentId = inputTokens.length>1?inputTokens[1]:"";
 		String worflowId = inputTokens.length>2?inputTokens[2]:null;
 
-        Map<String, String> params = new HashMap<String,String>();
+        Map<String, Object> params = new HashMap<String,Object>();
         params.put("deployment_id", deploymentId);
         params.put("workflow_id", worflowId);
 		

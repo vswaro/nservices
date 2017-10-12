@@ -63,7 +63,7 @@ public class RestClient {
 		return post(relativeUrl, null, null);
 	}
 
-	public final Object post(final String relativeUrl, final Map<String, String> params, final Map<String, String> headers) throws Exception {
+	public final Object post(final String relativeUrl, final Map<String, Object> params, final Map<String, String> headers) throws Exception {
 		final HttpPost httppost = new HttpPost(getFullUrl(relativeUrl));
 		if (headers != null) {
 			for (final Map.Entry<String, String> entry : headers.entrySet()) {
