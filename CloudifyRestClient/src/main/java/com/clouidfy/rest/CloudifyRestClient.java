@@ -5,12 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 public class CloudifyRestClient {
     // HostOnly - 172.16.0.1 Bridge - 10.11.94.58
-	private static final String HOSTURL = "http://172.16.0.1/api/v3.1";
+	private static final String HOSTURL = "http://10.11.94.58/api/v3.1/";
 	private final String USERNAME = "admin";
 	private final String PASSWORD = "admin"; 
 
@@ -31,59 +28,26 @@ public class CloudifyRestClient {
 		if(params!=null && params.entrySet().size()>0)
 			relativeURL = relativeURL +  "?" + getParamStr(params);
 		
-		System.out.println(operationOn.toUpperCase()+ " LIST: "+relativeURL);
+		System.out.println("Response from Cloudify host("+HOSTURL+relativeURL+")....");
 		return (String)restClient1.get(relativeURL, headers);
 	}
 	
 	public static String processGet(String operationOn) throws Exception {
 		return processGet(operationOn, null);
 	}
-	
-	public static String processPut(String operationOn, Map<String, Object> params,String deploymentsId) throws Exception{
-		String relativeURL =  null;
-		if (operationOn != null && deploymentsId != null) {
-			relativeURL = operationOn +"/"+deploymentsId;			
-		}
-		System.out.println( "print the relative url: "+relativeURL);		
-		return (String)restClient1.put(relativeURL, params, headers);
-	}
 	public static String processGet(String operationOn, Map<String, String> params) throws Exception {
 		String relativeURL = operationOn;
 		if(params!=null && params.entrySet().size()>0)
 			relativeURL = relativeURL +  "?" + getParamStr(params);
 		
-		System.out.println(operationOn + "GET: "+relativeURL);
+		System.out.println("Response from Cloudify host("+HOSTURL+relativeURL+")....");
 		return (String)restClient1.get(relativeURL, headers);
 	}
 	
-	// update execution
-	public static String processUpdateExecutions(String operationOn, String executionId, Map<String, String> params, String printShort) throws Exception {
-		String operation= null;
-		String relativeURL =  null;
-		if ("updateexecutions".equals(operationOn)){
-			 operation ="executions";
-		}
-		 Map<String, String> printShortMap = new HashMap<String, String>();
-		if (printShort!=null && printShort.equals("-s")) {
-			printShortMap.put("_include", "id");
-		}
-		if (printShortMap!= null && printShortMap.size() >0 ) {
-		 relativeURL = operation+"/"+executionId+ "?"+getParamStr1(printShortMap);
-		}
-		else {
-		 relativeURL = operation+"/"+executionId;
-		}
-
-		System.out.println(operationOn.toUpperCase()+ ": "+relativeURL);
-		//return null;
-		return (String)restClient1.patch(relativeURL, params, headers);
-	}
-	
-	public static String processExecutions(String operationOn, Map<String, String> params) throws Exception {
+	public static String processExecutions(String operationOn, Map<String, Object> params) throws Exception {
 		String relativeURL = operationOn;
 
-		System.out.println(operationOn.toUpperCase()+ ": "+relativeURL);
-		//return null;
+		System.out.println("Response from Cloudify host("+HOSTURL+relativeURL+")....");
 		return (String)restClient1.post(relativeURL, params, headers);
 	}
 
@@ -91,13 +55,34 @@ public class CloudifyRestClient {
 		String response = "";
 		String operationOn = inputTokens.length>1?inputTokens[1]:"";
 		String printShort = inputTokens.length>2?inputTokens[2]:null;
-
+		String printShortDetailId = inputTokens.length>3?inputTokens[3]:null;
+		printShortDetailId = printShortDetailId==null?"id":printShortDetailId;
+		
 		Map<String, String> params = new HashMap<String,String>();
 		if (printShort!=null && printShort.equals("-s")) {
-			params.put("_include", "id");
+			params.put("_include", printShortDetailId);
 		}
 		
 		response = CloudifyRestClient.processList(operationOn, params);
+		return response;
+	}
+	
+	public String executeGetCommand(String[] inputTokens) throws Exception{
+		String response = "";
+		String operationOn = inputTokens.length>1?inputTokens[1]:"";
+		String inputId = inputTokens.length>2?inputTokens[2]:null;
+		String printShort = inputTokens.length>3?inputTokens[3]:null;
+		String printShortDetailId = inputTokens.length>4?inputTokens[4]:null;
+		printShortDetailId = printShortDetailId==null?"id":printShortDetailId;
+		
+		Map<String, String> params = new HashMap<String,String>();
+		if(inputId!=null)
+			params.put("id", inputId);
+		if (printShort!=null && printShort.equals("-s")) {
+			params.put("_include", printShortDetailId);
+		}
+		
+		response = CloudifyRestClient.processGet(operationOn, params);
 		return response;
 	}
 	
@@ -107,67 +92,19 @@ public class CloudifyRestClient {
 		String deploymentId = inputTokens.length>1?inputTokens[1]:"";
 		String worflowId = inputTokens.length>2?inputTokens[2]:null;
 
-		/*ObjectMapper mapper = new ObjectMapper();
-        ObjectNode executionsNode = mapper.createObjectNode();
-        executionsNode.put("deployment_id", deploymentId);
-        executionsNode.put("workflow_id", worflowId);
-        executionsNode.toString();*/
-        
-        Map<String, String> params = new HashMap<String,String>();
+        Map<String, Object> params = new HashMap<String,Object>();
         params.put("deployment_id", deploymentId);
         params.put("workflow_id", worflowId);
 		
 		response = CloudifyRestClient.processExecutions(operationOn, params);
 		return response;
 	}
-	
-	public String updateExecutionsCommand(String[] inputTokens) throws Exception {
-		String response = "";
-		String operationOn = inputTokens.length>0?inputTokens[0]:"";
-		String executionId = inputTokens.length>1?inputTokens[1]:"";
-		//String worflowId = inputTokens.length>2?inputTokens[2]:null;
-		String status = inputTokens.length>2?inputTokens[2]:"";
-		String printShort = inputTokens.length>3?inputTokens[3]:null;
-		System.out.println("pritn the executionId"+executionId);
-		System.out.println("pritn the status"+status);
-		
-		//String printShort = inputTokens.length>2?inputTokens[2]:null;
-
-		//Map<String, String> params = new HashMap<String,String>();
-		/*if (printShort!=null && printShort.equals("-s")) {
-			params.put("_include", "id");
-		}*/
-		
-		
-		
-		
-		
-		
-		Map<String, String> params = new HashMap<String,String>();
-		params.put("status", status);
-		
-		
-		response = CloudifyRestClient.processUpdateExecutions(operationOn,executionId, params,printShort);
-		return response;
-		//return null;
-		
-	}
-
-	public String executeGetCommand(String[] inputTokens) throws Exception{
-		String response = "";
-		String operationOn = inputTokens.length>1?inputTokens[1]:"";
-		String inputId = inputTokens.length>2?inputTokens[2]:null;
-		String printShort = inputTokens.length>3?inputTokens[3]:null;
-		
-		Map<String, String> params = new HashMap<String,String>();
-		if(inputId!=null)
-			params.put("id", inputId);
-		if (printShort!=null && printShort.equals("-s")) {
-			params.put("_include", "id");
-		}
-		
-		response = CloudifyRestClient.processGet(operationOn, params);
-		return response;
+	public static String getParamStr(Map<String, String> params) {
+		StringBuilder paramsBuilder = new StringBuilder();
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			paramsBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+		} 
+		return paramsBuilder.toString();
 	}
 	
 	public String executecreateDeploymentsCommand(String[] inputTokens) throws Exception {
@@ -202,22 +139,15 @@ public class CloudifyRestClient {
 		response = CloudifyRestClient.processPut(operationOn, params,deploymentsId);
 		return response;
 	}
-	public static String getParamStr1(Map<String, String> params) {
-		StringBuilder paramsBuilder = new StringBuilder();
-		for (Map.Entry<String, String> entry : params.entrySet()) {
-			paramsBuilder.append(entry.getKey()).append("=").append(entry.getValue());
-		} 
-		return paramsBuilder.toString();
+	
+	public static String processPut(String operationOn, Map<String, Object> params,String deploymentsId) throws Exception{
+		String relativeURL =  null;
+		if (operationOn != null && deploymentsId != null) {
+			relativeURL = operationOn +"/"+deploymentsId;			
+		}	
+		return (String)restClient1.put(relativeURL, params, headers);
 	}
 	
-	public static String getParamStr(Map<String, String> params) {
-		StringBuilder paramsBuilder = new StringBuilder();
-		for (Map.Entry<String, String> entry : params.entrySet()) {
-			paramsBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-		} 
-		return paramsBuilder.toString();
-	}
-
 	public static void main(String[] args) throws Exception {
 		CloudifyRestClient client = new CloudifyRestClient();
 		Scanner scanner = new Scanner(System.in);
@@ -241,19 +171,32 @@ public class CloudifyRestClient {
 
 			switch (operation) {
 			case "list":
-				response = client.executeListCommand(inputTokens);
+				try {
+					response = client.executeListCommand(inputTokens);
+				} catch (Exception e) {
+					response = e.getMessage();
+				}
 				break;
 			case "get":
-				response = client.executeGetCommand(inputTokens);
+				try {
+					response = client.executeGetCommand(inputTokens);
+				} catch (Exception e) {
+					response = e.getMessage();
+				}
 				break;
 			case "executions":
-				response = client.executeExecutionsCommand(inputTokens);
-				break;
-			case "updateexecutions":
-				response = client.updateExecutionsCommand(inputTokens);
+				try {
+					response = client.executeExecutionsCommand(inputTokens);
+				} catch (Exception e) {
+					response = e.getMessage();
+				}
 				break;
 			case "deployments":
+				try {
 				response = client.executecreateDeploymentsCommand(inputTokens);
+				}catch(Exception e) {
+					response = e.getMessage();
+				}
 				break;
 			case "help":
 				printHelp();
@@ -279,11 +222,12 @@ public class CloudifyRestClient {
 	}
 
 	private static void printHelp() {
-		System.out.println("Help : These commands are defined internally. Type 'help' or'exit'");
-		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups");
-		System.out.println("Usage: get [options] [inputs]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version \n \t inputs: -s  prints short details, default prints all");
-		System.out.println("Usage: executions <deployment-id> [workflowId] \n \t worflowid: install|uninstall");
-		System.out.println("Usage: executions <execution-id> [status] \n \t status: cancelled");
+		System.out.println("Commands Help");
+		System.out.println("Usage: 'help' or'exit'");
+		System.out.println("Usage: list [options]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|events \n\t inputs: -s <json elements> -> prints minimal details (or) by default prints all \n\t Example: list deployments -s id,deployment_id");
+		System.out.println("Usage: get [options] [inputs]\n \t options: blueprints|deployments|executions|node-instances|nodes|plugins|tentants|users|user-groups|status|version \n \t inputs: -s <json elements> -> prints minimal details (or) by default prints all \n\t Example: get executions 953f7e7a-0fb8-4af4-9899-a5f5c0595a3f -s id");
+		System.out.println("Usage: executions <deployment-id> [workflowId] \n\t worflowId: install|uninstall \n\t Example: executions nodecellar-docker-deploy1 install ");
+		System.out.println("Usage: deployments <deployment-id> <blueprint-id> inputs[] \n\t Inputs: agent_private_key_path && agent_user && server_ip && webserver_port \n\t Example: deployments helloworldDeploy helloworld /home/cloudify-cert.pem cloudify 10.0.2.15 8081 ");
 	}
 
 }
