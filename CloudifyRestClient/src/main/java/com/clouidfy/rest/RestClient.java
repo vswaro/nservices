@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -16,7 +17,9 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -56,6 +59,8 @@ public class RestClient {
 				httpMethod.addHeader(entry.getKey(), entry.getValue());
 			}
 		}
+		System.out.println("print the HttpMethod"+httpMethod);
+		//return null;
 		return executeHttpMethod(httpMethod);
 	}
 
@@ -81,9 +86,58 @@ public class RestClient {
 				throw new Exception(e);
 			}
 		}
+		System.out.println("print the httppost"+httppost);
+		//return null;
 		return executeHttpMethod(httppost);
 	}
+	
+	public final Object put(final String relativeUrl, final Map<String, Object> params,final Map<String, String> headers) throws Exception {
+		final HttpPut httpput = new HttpPut(getFullUrl(relativeUrl));
+		if (headers != null) {
+			for (final Map.Entry<String, String> entry : headers.entrySet()) {
+				httpput.addHeader(entry.getKey(), entry.getValue());
+			}
+		}
+		if (params != null) {
+			HttpEntity entity;
+			try {
+				final String json = RestClient.mapToJson(params);				
+				entity = new StringEntity(json, "UTF-8");
+				httpput.setEntity(entity);
+				httpput.setHeader(HttpHeaders.CONTENT_TYPE, MIME_TYPE_APP_JSON);
+			} catch (final IOException e) {
+				throw new Exception(e);
+			}
+		}
+		System.out.println("print the httpput"+httpput);		
+		return executeHttpMethod(httpput);
+	}
 
+	public final Object patch(final String relativeUrl, final Map<String, String> params, final Map<String, String> headers) throws Exception {
+		final HttpPatch httppatch = new HttpPatch(getFullUrl(relativeUrl));
+		if (headers != null) {
+			for (final Map.Entry<String, String> entry : headers.entrySet()) {
+				httppatch.addHeader(entry.getKey(), entry.getValue());
+			}
+		}
+		if (params != null) {
+			HttpEntity entity;
+			try {
+				final String json = RestClient.mapToJson(params);
+				System.out.println("print the json"+json);
+				entity = new StringEntity(json, "UTF-8");
+				httppatch.setEntity(entity);
+				httppatch.setHeader(HttpHeaders.CONTENT_TYPE, MIME_TYPE_APP_JSON);
+			} catch (final IOException e) {
+				throw new Exception(e);
+			}
+		}
+		System.out.println("print the httppatch"+httppatch);
+	
+		return executeHttpMethod(httppatch);
+	}
+	
+	
 	public final Object delete(final String relativeUrl, final Map<String, String> params) throws Exception {
 		final HttpDelete httpdelete = new HttpDelete(getFullUrl(relativeUrl));
 		if (params != null) {
@@ -98,12 +152,10 @@ public class RestClient {
 		String responseBody;
 		try {
 			final HttpResponse response = httpClient.execute(httpMethod);
-
-			final int statusCode = response.getStatusLine().getStatusCode();
+			final int statusCode = response.getStatusLine().getStatusCode();			
 			if (statusCode != 200 && statusCode != 201) {
 				final String reasonPhrase = response.getStatusLine().getReasonPhrase();
 				throw new Exception(reasonPhrase);
-
 			}
 			return getResponse(response);
 		} catch (final IOException e) {
@@ -178,5 +230,7 @@ public class RestClient {
 	public static String mapToJson(final Map<String, ?> map) throws IOException {
 		return PROJECT_MAPPER.writeValueAsString(map);
 	}
+
+	
 
 }
